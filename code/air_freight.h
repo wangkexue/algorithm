@@ -63,23 +63,32 @@ class Schedule
   }
   void getOPT(int* weeks)
   {
-    int i, j;
+    int i, j, k;
     OPT[0] = 0;
     for(i=1;i<n+1;i++)
       {
-	if(4*c + OPT[p[i]] <= weeks[i-1] + OPT[i-1])
+	if(4*c + OPT[p[i]] <= r*weeks[i-1] + OPT[i-1])
 	  {
 	    OPT[i] = 4*c + OPT[p[i]];
-	    for(j=p[i];j<=i;j++)
+	    /*
+	    for(j=i;j>p[i];j--)
 	      {
-		S[j] = 'B';
+		  S[j] = 'B';
 	      }
+	    */
 	  }
 	else
 	  {
 	    OPT[i] = r*weeks[i-1] + OPT[i-1];
-	    S[i] = 'A';
+	    //S[i] = 'A';
 	  }
+      }
+    for(i=1;i<n+1;i++)
+      {
+	if(OPT[i] - OPT[i-1] == r*weeks[i-1])
+	  S[i] = 'A';
+	else
+	  S[i] = 'B';
       }
   }
   void printS()
