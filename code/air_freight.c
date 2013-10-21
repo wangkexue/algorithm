@@ -14,9 +14,11 @@ int main()
   Test test;
   test.weeks = new int[test.num]; 
   get_test(&test);
+  //cout << test.num << endl;
   cout << "Test:" << ' ';
   test.printTest();
-  Schedule schedule;
+  Schedule schedule(test.num, test.weeks, r, c);
+  delete []test.weeks;
 }
 
 void get_test(Test* test)
@@ -43,8 +45,11 @@ void get_test(Test* test)
 		      delete []weeks;
 		      break;
 		    }
-		  test->num = i;
+		  //cout << weeks[i] << endl;
+		  test->num = i+1;
 		  test->weeks[i] = weeks[i];
+		  //cout << test->num << '\t';
+		  //cout << test->weeks[i] << endl;
 		  //test->printTest();
 		}
 	    }
