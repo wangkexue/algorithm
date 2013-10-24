@@ -1,0 +1,202 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Short Sectioned Assignment
+% LaTeX Template
+% Version 1.0 (5/5/12)
+%
+% This template has been downloaded from:
+% http://www.LaTeXTemplates.com
+%
+% Original author:
+% Frits Wenneker (http://www.howtotex.com)
+%
+% License:
+% CC BY-NC-SA 3.0 (http://creativecommons.org/licenses/by-nc-sa/3.0/)
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%----------------------------------------------------------------------------------------
+%	PACKAGES AND OTHER DOCUMENT CONFIGURATIONS
+%----------------------------------------------------------------------------------------
+
+\documentclass[paper=a4, fontsize=11pt]{scrartcl} % A4 paper and 11pt font size
+
+\usepackage[T1]{fontenc} % Use 8-bit encoding that has 256 glyphs
+\usepackage{fourier} % Use the Adobe Utopia font for the document - comment this line to return to the LaTeX default
+\usepackage[english]{babel} % English language/hyphenation
+\usepackage{amsmath,amsfonts,amsthm} % Math packages
+
+\usepackage{lipsum} % Used for inserting dummy 'Lorem ipsum' text into the template
+
+\usepackage{sectsty} % Allows customizing section commands
+\allsectionsfont{\centering \normalfont\scshape} % Make all sections centered, the default font and small caps
+
+\usepackage{fancyhdr} % Custom headers and footers
+
+\usepackage{verbatim} % Enable batch comments
+
+\usepackage{algorithm}
+\usepackage{algorithmic} % pesudo code
+
+\usepackage{calligra}
+\usepackage[T1]{fontenc} % Enable caligra typeface
+
+\usepackage{enumerate}
+
+\pagestyle{fancyplain} % Makes all pages in the document conform to the custom headers and footers
+\fancyhead{} % No page header - if you want one, create it in the same way as the footers below
+\fancyfoot[L]{} % Empty left footer
+\fancyfoot[C]{} % Empty center footer
+\fancyfoot[R]{\thepage} % Page numbering for right footer
+\renewcommand{\headrulewidth}{0pt} % Remove header underlines
+\renewcommand{\footrulewidth}{0pt} % Remove footer underlines
+\setlength{\headheight}{13.6pt} % Customize the height of the header
+
+\numberwithin{equation}{section} % Number equations within sections (i.e. 1.1, 1.2, 2.1, 2.2 instead of 1, 2, 3, 4)
+\numberwithin{figure}{section} % Number figures within sections (i.e. 1.1, 1.2, 2.1, 2.2 instead of 1, 2, 3, 4)
+\numberwithin{table}{section} % Number tables within sections (i.e. 1.1, 1.2, 2.1, 2.2 instead of 1, 2, 3, 4)
+
+\setlength\parindent{0pt} % Removes all indentation from paragraphs - comment this line for an assignment with lots of text
+
+%----------------------------------------------------------------------------------------
+%	TITLE SECTION
+%----------------------------------------------------------------------------------------
+
+\newcommand{\horrule}[1]{\rule{\linewidth}{#1}} % Create horizontal rule command with 1 argument of height
+
+\title{	
+\normalfont \normalsize 
+\textsc{Northwestern University, EECS Department} \\ [25pt] % Your university, school and/or department name(s)
+\horrule{0.5pt} \\[0.4cm] % Thin top horizontal rule
+\huge EECS 336 Homework 4 \\ % The assignment title
+\horrule{2pt} \\[0.5cm] % Thick bottom horizontal rule
+}
+
+\author{Zhiyuan Wang and Yuchen Yang} % Your name
+
+\date{\normalsize\today} % Today's date or a custom date
+
+\makeatletter
+\renewcommand{\section}{\@startsection{section}{1}{0mm}
+  {-\baselineskip}{0.5 \baselineskip}{\bf\leftline}}
+\makeatother
+\makeatletter
+\renewcommand{\subsection}{\@startsection{subsection}{10}{0mm}{-\baselineskip}{0.5 \baselineskip}{\bf\leftline}}
+\makeatother
+
+\newenvironment{myproof}{\begin{proof}\setlength{\parindent}{2em}}{\end{proof}}
+
+\begin{document}
+\setlength{\parindent}{2em}
+\maketitle % Print the title
+
+%----------------------------------------------------------------------------------------
+%	PROBLEM 1
+%----------------------------------------------------------------------------------------
+
+\section{ \it{\textbf{Algorithm Desgin}} \calligra{P} 6.11 }
+\subsection{Solution}
+\renewcommand{\theenumii}{\alph{enumii}}
+
+\begin{enumerate}[(a)]
+\item
+$OPT[i] = $ "the total cost of the optimal schedule on weeks $\{1, \ldots , n\}$(sorted by time)"
+\item
+$OPT[i] = min\{4c+OPT[p[i]],  v_i+OPT[i-1]\}$, where $p[i]=i-4$, when $i\leq 4$, $p[i] = 0$.
+\item
+$OPT[0] = 0$
+\item
+\begin{algorithmic}
+\STATE \textbf{initialize} p[] appropriately.
+\STATE $OPT[0] \leftarrow 0$
+\STATE $S[0] \leftarrow 0$
+\FOR{$i\leftarrow 1 \ldots n$}
+	\IF{$4c+OPT[p[i]] \leq v_i+OPT[i-1]$}
+		\STATE  $OPT[i] = 4c + OPT[p[i]]$
+	\ELSE
+		\STATE $OPT[i] = v_i+OPT[i-1]$
+	\ENDIF
+\ENDFOR
+\STATE $num \leftarrow 0$
+\FOR {$i \leftarrow 1 \ldots n$}
+	\IF {$OPT[i]-OPT[i-1] = v_i$}
+		\STATE $S[i] = A$
+	\ELSE
+		\STATE $S[i] = B$
+	\ENDIF
+\ENDFOR
+\RETURN $OPT[n]$
+\end{algorithmic}
+\end{enumerate}
+\begin{myproof}
+\textbf{Correctness}. 
+For $(b)$,  in each iteration we focus on current week $i$'s schedule to minimal $weeks[1$ to $i]$s' cost. There are only two choice for the optimal schedule of week $i$. if we choose A, since A won't affect the past weeks, so $OPT[i] = v_i + OPT[i-1]$. If we choose B, it's much like interval schedule problem, since B should be take in the 4 contiguous weeks, the last three weeks' previous optimal schedule conflicts with the current one, so the cost of current week's optimal schedule should be $4c+OPT[p[i]]$, which means the optimal schedule's cost of $weeks[i-4]$ plus $weeks[i-3$ to $i]$ taking B's cost.
+
+For the first 4 weeks, their $p[i]$ is 0, because the only scenario when we can choose B in these weeks is that when there are some weeks in the first 4 weeks has more 40 equipment to ship. If this situation occurs in the 4th week, that's fine, the first 4 weeks will be included in B plan, otherwise as long as the 4th week has more than one equipment to ship, $4c$ will be $< OPT[3]+1 = 4c+1$, then the first 4 weeks will be included in B plan.
+
+\textbf{Runtime}.
+The running time of this algorithm is $O(n)$, since each week is cosidered once, and per week need constant operations.
+\end{myproof}
+\section{Additional Problems}
+\begin{enumerate}
+\item %pro1
+\begin{enumerate}
+\item sort by increasing slope $\leftarrow L[]$
+\item compare $L[i]$ with $L[i+1]$ for $1\leq i < n$
+\item if slope of $L[i]$ = slope of $L[i+1]$, mark the one will smaller b "drop parallel"
+\item for $1\leq i < n$, remove $L[i]$ if it is marked "drop parallel"
+\item 
+\begin{algorithmic}
+\STATE \textbf{defun} recursion ($L[]$)
+\IF {length of $L[] = 1$}
+	\RETURN the graph
+\ENDIF
+\STATE Divide $L[]$ into 2 halves
+\STATE $L_1$ contains $L[1$ to $\cfrac{n}{2}]$
+\STATE $L_2$ contains $L[\cfrac{n}{2} + 1$ to $n]$
+\RETURN  merge(recursion($L_1$), recursion($L_2$))
+\STATE
+\STATE \textbf{defun} merge($L_1$, $L_2$)
+\FOR {$i \leftarrow 1 \ldots$ length of $L_1$}
+	\STATE check $L_1[i]$ with $L_2$
+	\IF {finds an intersection}
+		\STATE $inter \leftarrow$ intersection point
+		\STATE $L_2 \leftarrow$ remove segment of $L_2$, where $x < x$ of $inter$ 
+		\STATE $L_1\leftarrow$ remove segment of $L_1$, where $x > x$ of $inter$
+		\STATE $L_c\leftarrow$ combine $L1$ and $L_2$
+		\RETURN $L_c$
+	\ELSE
+		\STATE $inter \leftarrow$ end point of segment of $L_1[i]$
+		\STATE $L_2\leftarrow$ remove segment of $L_2$, where $x < x$ of inter
+	\ENDIF
+\ENDFOR
+\end{algorithmic}
+\item $L_c$: if $L[i]$'s segment is in $L_c$, then $L[i]$ is visible, the length of $L_c$ = the number of lines that's visible
+\end{enumerate}
+\begin{myproof}
+Since in this algorithm we combine lines with their visible segments to reach the answer, we should first consider some properties of lines and such set of segments.
+\textbf{Correctness}.
+ Base case: length of $L = 1$, all lines in $L$ is visible.
+
+Induction: Assume this algorithm outputs the correct answer for $n$ lines. For $n+1$ case, the addtional line(as $line*$) will either be grouped inside the first half or the second half. When we divide the sorted lines into two halves. If the line is in the first half, then according to \textbf{merge()}, the segment of this line where $x > x$ of the intersection point will be removed, because the slope of every line in the second half is bigger than that of this line, thus covering the part of this line where $x > x$ of the intersection point.
+
+If $line*$ is in the second half, then according to \textbf{merge()}, the segment of $line*$ where $x < x$ of intersection point will be removed because slope of every line in the first half is smaller, thus covering the part of $line*$ where $x < x$ of intersection.
+
+After all of the recursion calls, the segment of $line*$ where it's not uppermost has been removed. If there is still a part of $line*$ remaining, then $line*$ is visible, otherwise not.
+\end{myproof}
+\item %pro2
+\begin{myproof}
+\textbf{Correctness}.
+
+\textbf{Runtime}. 
+\end{myproof} 
+
+\item %pro3
+\begin{myproof}
+\textbf{Correctness}. 
+
+\textbf{Runtime}.   
+\end{myproof}
+\end{enumerate}
+%----------------------------------------------------------------------------------------
+
+\end{document}
