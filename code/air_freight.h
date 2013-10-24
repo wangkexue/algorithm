@@ -1,5 +1,5 @@
 #include <iostream>
-using namespace std;
+using std::cout;
 
 class Test
 {
@@ -7,10 +7,6 @@ class Test
   int num;
   int* weeks;
  public:
-  ~Test()
-  {
-    //delete []weeks;
-  }
   void printTest()
   {
     int i;
@@ -18,7 +14,7 @@ class Test
       {
 	cout << weeks[i] << ' ';
       }
-    cout << endl;
+    cout << '\n';
   }
 };
 
@@ -70,26 +66,26 @@ class Schedule
 	if(4*c + OPT[p[i]] <= r*weeks[i-1] + OPT[i-1])
 	  {
 	    OPT[i] = 4*c + OPT[p[i]];
-	    /*
-	    for(j=i;j>p[i];j--)
-	      {
-		  S[j] = 'B';
-	      }
-	    */
 	  }
 	else
 	  {
 	    OPT[i] = r*weeks[i-1] + OPT[i-1];
-	    //S[i] = 'A';
 	  }
       }
-    for(i=1;i<n+1;i++)
+    i = n;
+    while(i)
       {
-	if(OPT[i] - OPT[i-1] == r*weeks[i-1])
-	  S[i] = 'A';
-	else
-	  S[i] = 'B';
+	S[i] = 'A';
+	if(OPT[i]==4*c+OPT[p[i]]&&OPT[i]!=OPT[i-1]+r*weeks[i-1])
+	  {
+	    for(j=p[i]+1;j<=i;j++)
+	      S[j] = 'B';
+	    i = p[i];
+	    continue;
+	  }
+	i--;
       }
+     
   }
   void printS()
   {
@@ -99,9 +95,9 @@ class Schedule
       {
 	cout  << S[i] << "  ";
       }
-    cout <<"cost:" << OPT[i-1] << endl;
+    cout <<"cost:" << OPT[i-1] << '\n';
   }
 };
 
-void get_test(Test*);
+//void get_test(Test*);
 
