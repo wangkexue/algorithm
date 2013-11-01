@@ -92,7 +92,8 @@
 %----------------------------------------------------------------------------------------
 %	PROBLEM 1
 %----------------------------------------------------------------------------------------
-
+\section{About Code}
+Two of our real code is written in C++(it's a little long for C++ to implement all the algorithm and test), due to the one page limitation, we only include results of the test cases(copied from prompt) and the minimal code for the main class, which implement the dynamic programming algorithm. The main() function and a helper class Test are printed on the back of the same page. All the solutions are tested at least 4 cases, for the last problem since we should print 3 lines(Event, Coordinate and test result) for the test case, we can only include 2 test cases in one page, but actually we make 4 test cases.
 \section{ \it{\textbf{Algorithm Desgin}} \calligra{P} 6.11 }
 \subsection{Solution}
 \renewcommand{\theenumii}{\alph{enumii}}
@@ -108,7 +109,6 @@ $OPT[0] = 0$
 \begin{algorithmic}
 \STATE \textbf{initialize} p[] appropriately.
 \STATE $OPT[0] \leftarrow 0$
-\STATE $S[0] \leftarrow 0$
 \FOR{$i\leftarrow 1 \ldots n$}
 	\IF{$4c+OPT[p[i]] \leq v_i+OPT[i-1]$}
 		\STATE  $OPT[i] = 4c + OPT[p[i]]$
@@ -116,20 +116,12 @@ $OPT[0] = 0$
 		\STATE $OPT[i] = v_i+OPT[i-1]$
 	\ENDIF
 \ENDFOR
-\STATE $num \leftarrow 0$
-\FOR {$i \leftarrow 1 \ldots n$}
-	\IF {$OPT[i]-OPT[i-1] = v_i$}
-		\STATE $S[i] = A$
-	\ELSE
-		\STATE $S[i] = B$
-	\ENDIF
-\ENDFOR
 \RETURN $OPT[n]$
 \end{algorithmic}
 \end{enumerate}
 \begin{myproof}
 \textbf{Correctness}. 
-For $(b)$,  in each iteration we focus on current week $i$'s schedule to minimal $weeks[1$ to $i]$s' cost. There are only two choice for the optimal schedule of week $i$. if we choose A, since A won't affect the past weeks, so $OPT[i] = v_i + OPT[i-1]$. If we choose B, it's much like interval schedule problem, since B should be take in the 4 contiguous weeks, the last three weeks' previous optimal schedule conflicts with the current one, so the cost of current week's optimal schedule should be $4c+OPT[p[i]]$, which means the optimal schedule's cost of $weeks[i-4]$ plus $weeks[i-3$ to $i]$ taking B's cost.
+For $(b)$ recurrence,  in each iteration we focus on current week $i$'s schedule to minimal $weeks[1$ to $i]$s' cost. There are only two choice for the optimal schedule of week $i$. if we choose A, since A won't affect the past weeks, so $OPT[i] = v_i + OPT[i-1]$. If we choose B, it's much like interval schedule problem, since B should be take in the 4 contiguous weeks, the last three weeks' previous optimal schedule conflicts with the current one, so the cost of current week's optimal schedule should be $4c+OPT[p[i]]$, which means the optimal schedule's cost of $weeks[i-4]$ plus $weeks[i-3$ to $i]$ taking B's cost.
 
 For the first 4 weeks, their $p[i]$ is 0, because the only scenario when we can choose B in these weeks is that when there are some weeks in the first 4 weeks has more 40 equipment to ship. If this situation occurs in the 4th week, that's fine, the first 4 weeks will be included in B plan, otherwise as long as the 4th week has more than one equipment to ship, $4c$ will be $< OPT[3]+1 = 4c+1$, then the first 4 weeks will be included in B plan.
 
@@ -173,7 +165,10 @@ The running time of this algorithm is $O(n)$, since each week is cosidered once,
 \item $L_c$: if $L[i]$'s segment is in $L_c$, then $L[i]$ is visible, the length of $L_c$ = the number of lines that's visible
 \end{enumerate}
 \begin{myproof}
-Since in this algorithm we combine lines with their visible segments to reach the answer, we should first consider some properties of lines and such set of segments.
+Since in this algorithm we combine lines with their visible segments to reach the answer, we should first consider some properties of lines and such set of segments. If two lines intersect, then the line with lower slope will be uppermost in the left of the point of intersection, while the line with bigger slope will be upper on the right side. Now we cotinue to consider two sets(say $A$ and $B$) of segments, and all of $B$'s segments have a greater slope than $A$'s.  A and B must intersect, because in $(-\infty, \infty)$ B's slope is always bigger than A's, they will finally intersect like two lines. And they only have one intersection point(say $c$, on line $L_A$ in A and line $L_B$ in B). If there is another intersection point($c'$) on the right of $c$, remember that we only keep the uppermost segments of lines in A and B, and all the segments in B on the right of $L_B$ has a bigger slope than the segments in A, and they have the same relative origin point($c$), so they won't intersect. If they intersect, there must be one segment in B has smaller slope than segments in A, that contradicts the assumption. Now if there is another intersection point on the left of $c$, according to the above analysis, $c$ will be invaliated, that contradicts the assumption.
+
+Based on above fact, in each recursion we search the only intersection point of A and B, and remove the underlying segments as the algorithm shown.
+
 \textbf{Correctness}.
  Base case: length of $L = 1$, all lines in $L$ is visible.
 
@@ -183,19 +178,91 @@ If $line*$ is in the second half, then according to \textbf{merge()}, the segmen
 
 After all of the recursion calls, the segment of $line*$ where it's not uppermost has been removed. If there is still a part of $line*$ remaining, then $line*$ is visible, otherwise not.
 \end{myproof}
+
 \item %pro2
-\begin{myproof}
-\textbf{Correctness}.
-
-\textbf{Runtime}. 
-\end{myproof} 
-
-\item %pro3
+\begin{enumerate}
+\item 
+$OPT[i] = $ "The maximum number of boxes box[i] can contain including itself" sorted by increasing $h$.
+\item
+$OPT[i] = max\{ 1+OPT[1]$ or $1, 1+OPT[2]$ or $1, \ldots, 1+OPT[i-2]$ or $1, 1+OPT[i-1]$ or $1\}$
+\item
+base case: OPT[1] = 1
+\item
+\begin{algorithmic}
+\STATE $b[]\leftarrow$ sort boxes in increasing $h$
+\STATE initialize $OPT[]$ of length $n$
+\STATE initialize $M[]$ of length $n$
+\STATE $OPT[1]=1$
+\FOR {$i\leftarrow 2$ to $n$}
+	\FOR{$j\leftarrow 1$ to $i-1$}
+		\IF{($b[j].w < b[i].w $)\AND ($b[j].l < b[i] .l$)}
+			\STATE $M[j]=1+OPT[j]$
+		\ELSE
+			\STATE $M[j]=1$
+		\ENDIF
+	\ENDFOR
+	\STATE $OPT[i] = $ Max($M[]$)
+\ENDFOR
+\RETURN Max($OPT[]$)
+\end{algorithmic}
+\end{enumerate}
 \begin{myproof}
 \textbf{Correctness}. 
+For $OPT(i)$, we check $b(i)$ with every $b(j)$, in which $1\leq j < i$, because $b$ is sorted in increasing height, any $b(j)$ in which $j\geq i$ will not be able to fit into $b(i)$. For every check, if $b(j)$'s width and length are both smaller than that of $b(i)$, then $M(j) = 1 + OPT(j)$, otherwise $M(j) = 1$, where $M(j)$ is the maximum number of boxes $b(i)$ can contain, including itself, st the instance when we only consider $b(i)$ and $b(j)$. if $b(j)$ fits $b(i)$, then any box that fits $b(j)$ will also fit $b(i)$, thus $1 + OPT(j)$. To prove this, we know that $b(j)$ fits $b(i)$, so $b(j)$'s parameters are all smaller. Any box $b(k)$ that fits $b(j)$ will have all its parameters smaller than that of $b(j)$, and also smaller than that of $b(i)$, thus $b(k)$ fits $b(i)$. After calculating all of the $M$ values, the maximum number among $M$ is the maximum number of boxes $b(i)$ can contain, including itself, when we consider all $b(j)$ where $1 \leq  j \leq i$, which is $OPT(i)$.
 
-\textbf{Runtime}.   
+
+$max(OPT)$ is the maximum number of boxes that "I" can carry to the meeting.
+
+\textbf{Runtime}.   Sorting takes $O(nlogn)$, initialization takes $O(n)$, assignment takes constant time. The nested For loops taks $O(n^2)$, since it builds a $n$ by $n$ matrix, so the final runtime is $O(n^2)$. 
 \end{myproof}
+\item %pro3
+\begin{tabular}{l c c c c c c c c}
+  \hline                        
+  Event&1 & 2 & 3& 4&5&6&7&8\\
+  Coordinate&2 & -2 & -3 &10&11&12&13&1\\
+  \hline  
+\end{tabular}
+
+\begin{enumerate}
+\item
+For above input, the algorithm will first eliminate event 4 to 7, then it will begin with event 1 which at 2, and it will miss event 2 and 3, but if we go to event 2 first, we can also reach event 3,  in both ways we have enough time to reach the last event 8. Thus the optimal output for this input is 3, but by provided algorithm we can only achieve 2.
+\item
+\begin{enumerate}
+\item
+$OPT[i]=$ "the maximum number of event can be observed with event $i$ be observed "
+\item
+$OPT[i] =  1+\max\limits_{j:|c[j]-c[i]|\leq i-j} \{ OPT[j]\}$, $j$ is an event before $i$ which can be observed from start point, $c[]$ denotes the coordinate of certain event. 
+\item
+Base case: $OPT[0] = 0$, $c[0] = 0$
+\item
+\begin{algorithmic}
+\STATE $OPT[0] \leftarrow 0$, $c[0]\leftarrow 0$
+\FOR{$i\leftarrow 1$ to $n$}
+	\STATE $max \leftarrow 0$
+	\IF{$|c[j]|>i$}
+		\STATE OPT[j] = 0
+		\STATE \textbf{continue}
+	\ENDIF
+	\FOR{$j\leftarrow 1$ to $i$}
+		\IF{$|c[j]-c[i]| \leq j-i$}
+			\IF{$OPT[j] > max$}
+				\STATE $max \leftarrow OPT[j]$
+			\ENDIF
+		\ENDIF
+	\ENDFOR
+	\STATE $OPT[i] \leftarrow 1 + max$
+\ENDFOR
+\RETURN $OPT[n]$
+\end{algorithmic}
+\end{enumerate}
+\end{enumerate}
+\begin{myproof}
+\textbf{Correctness}.
+For recurrence, since in each iteration we find the former events which can be reached by current event $i$, and we find the one event $j$ can reach most previous events. Thus $OPT[j] + 1$ is the number of most previous events $i$ can reach including itself. 
+
+\textbf{Runtime}. $O(n^2)$, since there are 2 for loops, and each loop need at most $c\cdot n$ ($c$ is a constant) operations. The initialization takes $O(n)$ time. So the total running time is $O(n^2)$.
+\end{myproof} 
+
 \end{enumerate}
 %----------------------------------------------------------------------------------------
 
