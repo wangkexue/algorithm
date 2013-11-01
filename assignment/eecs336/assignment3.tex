@@ -1,0 +1,276 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Short Sectioned Assignment
+% LaTeX Template
+% Version 1.0 (5/5/12)
+%
+% This template has been downloaded from:
+% http://www.LaTeXTemplates.com
+%
+% Original author:
+% Frits Wenneker (http://www.howtotex.com)
+%
+% License:
+% CC BY-NC-SA 3.0 (http://creativecommons.org/licenses/by-nc-sa/3.0/)
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%----------------------------------------------------------------------------------------
+%	PACKAGES AND OTHER DOCUMENT CONFIGURATIONS
+%----------------------------------------------------------------------------------------
+
+\documentclass[paper=a4, fontsize=11pt]{scrartcl} % A4 paper and 11pt font size
+
+\usepackage[T1]{fontenc} % Use 8-bit encoding that has 256 glyphs
+\usepackage{fourier} % Use the Adobe Utopia font for the document - comment this line to return to the LaTeX default
+\usepackage[english]{babel} % English language/hyphenation
+\usepackage{amsmath,amsfonts,amsthm} % Math packages
+
+\usepackage{lipsum} % Used for inserting dummy 'Lorem ipsum' text into the template
+
+\usepackage{sectsty} % Allows customizing section commands
+\allsectionsfont{\centering \normalfont\scshape} % Make all sections centered, the default font and small caps
+
+\usepackage{fancyhdr} % Custom headers and footers
+
+\usepackage{verbatim} % Enable batch comments
+
+\usepackage{algorithm}
+\usepackage{algorithmic} % pesudo code
+
+\usepackage{calligra}
+\usepackage[T1]{fontenc} % Enable caligra typeface
+
+\pagestyle{fancyplain} % Makes all pages in the document conform to the custom headers and footers
+\fancyhead{} % No page header - if you want one, create it in the same way as the footers below
+\fancyfoot[L]{} % Empty left footer
+\fancyfoot[C]{} % Empty center footer
+\fancyfoot[R]{\thepage} % Page numbering for right footer
+\renewcommand{\headrulewidth}{0pt} % Remove header underlines
+\renewcommand{\footrulewidth}{0pt} % Remove footer underlines
+\setlength{\headheight}{13.6pt} % Customize the height of the header
+
+\numberwithin{equation}{section} % Number equations within sections (i.e. 1.1, 1.2, 2.1, 2.2 instead of 1, 2, 3, 4)
+\numberwithin{figure}{section} % Number figures within sections (i.e. 1.1, 1.2, 2.1, 2.2 instead of 1, 2, 3, 4)
+\numberwithin{table}{section} % Number tables within sections (i.e. 1.1, 1.2, 2.1, 2.2 instead of 1, 2, 3, 4)
+
+\setlength\parindent{0pt} % Removes all indentation from paragraphs - comment this line for an assignment with lots of text
+
+%----------------------------------------------------------------------------------------
+%	TITLE SECTION
+%----------------------------------------------------------------------------------------
+
+\newcommand{\horrule}[1]{\rule{\linewidth}{#1}} % Create horizontal rule command with 1 argument of height
+
+\title{	
+\normalfont \normalsize 
+\textsc{Northwestern University, EECS Department} \\ [25pt] % Your university, school and/or department name(s)
+\horrule{0.5pt} \\[0.4cm] % Thin top horizontal rule
+\huge EECS 336 Homework 3 \\ % The assignment title
+\horrule{2pt} \\[0.5cm] % Thick bottom horizontal rule
+}
+
+\author{Zhiyuan Wang and Yuchen Yang} % Your name
+
+\date{\normalsize\today} % Today's date or a custom date
+
+\makeatletter
+\renewcommand{\section}{\@startsection{section}{1}{0mm}
+  {-\baselineskip}{0.5 \baselineskip}{\bf\leftline}}
+\makeatother
+\makeatletter
+\renewcommand{\subsection}{\@startsection{subsection}{10}{0mm}{-\baselineskip}{0.5 \baselineskip}{\bf\leftline}}
+\makeatother
+
+\newenvironment{myproof}{\begin{proof}\setlength{\parindent}{2em}}{\end{proof}}
+
+\begin{document}
+\setlength{\parindent}{2em}
+\maketitle % Print the title
+
+%----------------------------------------------------------------------------------------
+%	PROBLEM 1
+%----------------------------------------------------------------------------------------
+
+\section{ \it{\textbf{Algorithm Desgin}} \calligra{P} 5.4 }
+\subsection{Solution}
+Algorithm is on page 2, in which we recursively divide the $n$ cards into halves, and find the subgroup with more than half of cards are equivalent, reporting this card to its parent group.
+\begin{comment}
+\newtheorem{lemma}{Lemma}[section]
+\begin{lemma}\label{lemma1}
+If in a collection of $n$ cards, there are more than $n/2$ cards are equivalent to $x$, then if we divide the $n$ cards into 2 identical subsets with $n/2$ cards, there must be at least one subset contains more than $n/4$ cards equivalent to $x$.
+\end{lemma}
+\begin{lemma}\label{lemma2}
+There can exist only one or no such $x$ in $n$ cards.
+\end{lemma}
+According to lemma \ref{lemma1}, we can divide the problem into subproblems, and we want to find the only $x$ to reduce the process of comparison, if it exists, otherwise we should prove its nonexistence.  So we pick the $x_i$ in the subgroup, which has more than half of its cards are equivalent to $x_i$, as $x$'s candidate. Then examine $x_i$ at its parent group.
+\end{comment}
+\begin{algorithm}
+\caption{find more than half size equivalent cards}
+\begin{algorithmic}
+\STATE \textbf{defun} fraud (n)
+\STATE associate each card with a count = 1
+\STATE recursive(n)
+\IF{$|n|\leq 3$}
+	\STATE check cards against each other once (i.e. (A B) (A C) (B C)), mark each couple checked
+	\IF{equivalent, combine two into one, associated count + 1}
+		\RETURN remaining cards
+	\ENDIF
+\ENDIF
+\IF{$|n|$ is odd}
+	\STATE $cond = (|n|-1)/2$
+	\STATE split $n$ into two parts $n_1$ and $n_2$
+	\STATE $n_1$ has $(|n|-1)/2$ cards and $n_2$ has $(|n|-1)/2+1$ cards
+\ELSE
+	\STATE $cond = |n|/2$
+	\STATE split $n$ into two parts $n_1$ and $n_2$ with equal number of cards
+\ENDIF
+\STATE s = combination of recursive($n_1$) and recursive($n_2$)
+\FOR{each card in $s$ with count $> (cond/2)$}
+	\STATE check the card with every other cards in s once if isn't marked checked, mark each couple checked
+	\IF{equivalent}
+	\STATE combine two into one, associated count + 1
+	\ENDIF
+\ENDFOR
+\RETURN remaining cards
+\STATE \textbf{endrecursive}
+\IF{max(count) > |n|/2}
+	\STATE there is a set
+\ELSE
+	\STATE there is no such set
+\ENDIF
+\end{algorithmic}
+\end{algorithm}
+
+\begin{myproof}
+\textbf{Correctness}. 
+\begin{comment}
+We can prove lemma \ref{lemma1} and lemma \ref{lemma2} by contradiction. If both of the subsets have less than $n/4$ cards equivalent to $x$, then there are less than $n/2$ cards equivalent to $x$ in the collection of $n$ cards, that contradicts the fact. Meanwhile, if there are more than $n/2$ cards equivalent to $x_1$ and also there are more than $n/2$ cards equivalent to $x_2$, then there should be at least $n+2$ cards, that also contradicts the fact.
+
+According to \ref{lemma1}, if $x$ exists, there must be 
+\end{comment}
+If there exists a set with $> n/2$ cards, then there can be only one such set.
+proof by contradiction - suppose there are two such sets, then total number of cards 
+is $> n$.
+when we split n into two halves, for each half, if there exists such set, then must be one
+of the cards with count $> n/4$. Proof by contradiction - suppose there exists such set, and 
+for each half, the card is not the one with count $> n/4$, then it is the one with count $<= n/4$. After combining the two halves, the total count is $<= n/2$.
+  
+  $*n/4$ here is the layer condition. Top layer is $n/(2^1)$, second is $n/(2^2)$, third is $n/(2^3)$ etc. bottom layer is 1.
+
+our goal is to try to find a card x with count $> n/2$ and our algorithm helps to determine 
+whether or not there exists card $x$.
+proof by induction - base case: $n <= 3$, two or more cards are equivalent implies $x$ exists otherwise 
+not. If two or more cards are equivalent, algorithm will output max(count) that is bigger or equal to 2, 
+which is bigger than either 3/2 or 2/2 and will conclude x exists.
+$n+1$ case: The algorithm will recursively split cards into two halves until each group contains $n \leq 3$ cards.
+It then goes through the base case and return the combined set to the immediate higher layer. The higher layer will 
+then check the cards, which passed the layer condition, with every other cards which haven't been checked. Combine 
+cards in the same layer into one set and return it to higher layer and do the same thing until it reaches the top layer, 
+which will check each card that passed the layer condition $n/4$. We only check cards whose count is bigger than
+the layer condition due to the fact that if there exists $x$, then it must be one of those that passed the layer condition.
+Finally, get the max of the counts (if there exists $x$ then it must have the biggest count, since if there is another card
+with even bigger count then there are two sets with count $> n/2$, which is impossible) and compare with $n/2$ to determine 
+whether or not there exists such set.   
+\textbf{Runtime}.
+associate each card with a count is $n$,
+ 
+max(count) is $n$,
+
+recursive is a $log(n)$ layered binary tree and since each layer does at most $n/2$ checks, recursive is $nlog(n)$,
+
+so runtime of this algorithm is $T(n) = O(nlog(n))$
+\end{myproof}
+\section{Additional Problems}
+\begin{enumerate}
+\item %pro1
+\begin{enumerate}
+\item
+\begin{algorithm}
+assume S\_ end is a set of sensitive processes that has been sorted in order of increasing end time\\
+assume S\_ start is a set of sensitive process that has been sorted in order of increasing start time
+\begin{algorithmic}
+\STATE $i\leftarrow 1$
+\WHILE{number of sensitive processes haven't been covered > 0}
+\STATE $S[] \leftarrow S\_ end(1)$ (process with minimum end time)
+\WHILE{start time of $S_{start[i]}$ < end time of $S_{end(1)}$}
+	\STATE $S[]\leftarrow S_{start[i]}$
+	\STATE $i++$
+\ENDWHILE
+\STATE run status\_ check() on element in $S[]$ with latest start time
+\STATE delete elements in $S[]$
+\ENDWHILE
+\end{algorithmic}
+\end{algorithm}
+\begin{myproof}
+\textbf{Correctness}. 
+Base case: number of processes  = 2, the algorithm picks the one
+with earlier end time first and then check it with the second one.
+If the start time of the second one is earlier than the end time of the first one then we only need 1 status\_ check, because the end time of second one is later than that of first one (has a period when both of them run at the same time), otherwise 2. It always runs status\_ check on the one with latest start time, because this specific time is always covered by all conflicting schedules.  
+Suppose the algorithm holds for k processes, for k+1 case, at one time in the algorithm, it will check whether or not the additional process is a conflict of any other processes. If yes it doesn't add another status\_ check, otherwise add one more.
+check for optimality: basicly the outer while loop will group processes that are all conflicting with each other in each loop excution and call status\_ check once. This means that if two schedules are not conflicting then the total depth will increase by one. After jumping out of the outer while loop the number of status\_ check = the depth of this problem in graph form. Since depth is the minimum number of status\_ check required to cover all of the processes, our algorithm produces the optimal solution.
+
+\textbf{Runtime}. Since each process is examined once(which use constant time), it's either be eliminated in a search or it's the start process of a new search. Thus, the runtime is $O(n)$.
+\end{myproof} 
+\item
+Ture.
+\begin{myproof}
+Since the $k^*$ processes are disjoint, if we call status\_ check $k^*-1$ times, there will be one process missed, that contradicts the assumption.
+
+$k^*$ is also the optimal solution. Suppose k > $k^*$ is the optimal solution, then at least one of the conflicting groups gets at least two status\_ check. However, for each conflicting group, only one status\_ check is required to finish the job. This contradicts the assumption that k is the optimal solution.
+\end{myproof}
+\end{enumerate}
+\item %pro2
+\begin{algorithm}
+\begin{algorithmic}
+\STATE $T \leftarrow \{ u\}$
+\WHILE{number of nodes haven't been covered > 0}
+	\STATE find a  node $v$ not in $T$ that can be attached to $T$ such that it maximize the total bandwidth.
+	\STATE add $v$ to $T$
+\ENDWHILE
+\end{algorithmic}
+\end{algorithm}
+\begin{myproof}
+\textbf{Correctness}.
+base case: $T = {u}$, the next node $v$ it finds will form an edge $(u,v)$ such that the 
+bandwidth of this edge is higher than bandwidth of any other edge that is connected to $u$.
+The bottleneck rate of this spanning tree $(edge (u,v))$ is the highest among all that of path from
+$u$ to $v$ because every path ends at u which contains one edge incident to $u$. The value of edge incident to $u$
+other than $(u,v)$ are all smaller than that of $(u,v)$ so T has the best achievable bottleneck rate.
+Assume this algorithm holds for n nodes. For $n + 1$, T is connected to a new node v through $(u,v)$. Suppose there
+is another edge $(u',v)$ that connects $T$ to v and forms the best achievable bottleneck rate, then value of $('u,v)$ must
+be higher than that of $(u,v)$. However $(u,v)$ is chosed instead by the algorithm so there is no $('u, v)$ that has a higher value. This contradicts our assumption and concludes that the algothrim outputs a spanning tree that has the best achievable bottleneck rate for every path.  
+
+\textbf{Runtime}. This algorithm has the same runtime as Prim's algorithm, $O(m+n)$ ($m$ is the number of edges). The worst case scenario happens when every node in $G$ is connected to each other. In this case $T$ checks with every possible edge in each while loop excution, at that time $m=n^2$. 
+\end{myproof}
+\newpage
+\item %pro3
+\begin{algorithm}
+\caption{find the $n^{th}$ smallest value }
+\begin{algorithmic}
+\STATE Initialize: $n_1, n_2\leftarrow n/2, k\leftarrow 1$
+\STATE \textbf{defun} get-nth($n_1, n_2, k, n$)
+\IF{$n/2^k = 1$}
+	\RETURN $min(m_1+m_2)$ 
+\ENDIF
+\STATE $m_1\leftarrow$ database1-query($n_1$)
+\STATE $m_2\leftarrow$ database2-query($n_2$)
+\IF{$n=1$}
+	\RETURN $min(m_1+m_2)$
+\ENDIF
+\STATE $k\leftarrow k+1$
+\IF{$m_1>m_2$}
+	\STATE  get-nth($n_1+n/2^k, n_2-n/2^k, k, n$)
+\ELSE
+	\STATE get-nth($n_1-n/2^k, n_2+n/2^k, k, n$)
+\ENDIF
+\end{algorithmic}
+\end{algorithm}
+\begin{myproof}
+\textbf{Correctness}. For convenience, we assume $n$ is a power of 2. Otherwise, when $n\%2^k \neq 0$, we can use $[n/2^k]$ as $n_i$ instead. We want to find the $n^{th}$ smallest value in the 2 databases, which in the median of these $2n$ values, if we sort these values in order. First we obtain the $(\cfrac{n}{2})^{th}$ smallest value $n_1$ and $n_2$ in each database by queries, assume $n_1>n_2$, then we can eliminate the $\cfrac{n}{2}$ values less than $n_2$ and the $\cfrac{n}{2}$ values larger than $n_1$, because if we sort the data in order they are respectively less and larger than $\cfrac{3n}{2}$ data, so the $n^{th}$ smallest value is among the median $n$ data between $n_1$ and $n_2$. Then we recursively find the median value of the remaining data, eliminate data outside the median $n/2^k$ range, and finally there will be only 2 data in the search space, and the smaller one is the $n^{th}$ smallest value (because in the last two data there must be $n$ and one value are larger $n$, suppose all the data in database1 are less than that in database2, then the largest value in database1 is $n$, all the data in database2 are larger than $n$. If we exchange $n$ with a value in database2, then in this value in database1 is larger than $n$).
+
+\textbf{Runtime}. Since in each recursion we reduce the search space into half and use the same $c$($c$ is a constant) operations. Thus, $T(n) = T(n/2) + c$. So the runtime is $O(\log n)$. 
+\end{myproof}
+\end{enumerate}
+%----------------------------------------------------------------------------------------
+
+\end{document}

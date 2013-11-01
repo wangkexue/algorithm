@@ -1,0 +1,410 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Short Sectioned Assignment
+% LaTeX Template
+% Version 1.0 (5/5/12)
+%
+% This template has been downloaded from:
+% http://www.LaTeXTemplates.com
+%
+% Original author:
+% Frits Wenneker (http://www.howtotex.com)
+%
+% License:
+% CC BY-NC-SA 3.0 (http://creativecommons.org/licenses/by-nc-sa/3.0/)
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%----------------------------------------------------------------------------------------
+%	PACKAGES AND OTHER DOCUMENT CONFIGURATIONS
+%----------------------------------------------------------------------------------------
+
+\documentclass[paper=a4, fontsize=11pt]{scrartcl} % A4 paper and 11pt font size
+
+\usepackage[T1]{fontenc} % Use 8-bit encoding that has 256 glyphs
+\usepackage{fourier} % Use the Adobe Utopia font for the document - comment this line to return to the LaTeX default
+\usepackage[english]{babel} % English language/hyphenation
+\usepackage{amsmath,amsfonts,amsthm} % Math packages
+
+\usepackage{lipsum} % Used for inserting dummy 'Lorem ipsum' text into the template
+
+\usepackage{sectsty} % Allows customizing section commands
+\allsectionsfont{\centering \normalfont\scshape} % Make all sections centered, the default font and small caps
+
+\usepackage{fancyhdr} % Custom headers and footers
+
+\usepackage{verbatim} % Enable batch comments
+
+\usepackage{algorithm}
+\usepackage{algorithmic} % pesudo code
+
+\usepackage{calligra}
+\usepackage[T1]{fontenc} % Enable caligra typeface
+
+\usepackage{graphicx}
+
+\usepackage{indentfirst}
+
+\pagestyle{fancyplain} % Makes all pages in the document conform to the custom headers and footers
+\fancyhead{} % No page header - if you want one, create it in the same way as the footers below
+\fancyfoot[L]{} % Empty left footer
+\fancyfoot[C]{} % Empty center footer
+\fancyfoot[R]{\thepage} % Page numbering for right footer
+\renewcommand{\headrulewidth}{0pt} % Remove header underlines
+\renewcommand{\footrulewidth}{0pt} % Remove footer underlines
+\setlength{\headheight}{13.6pt} % Customize the height of the header
+
+\numberwithin{equation}{section} % Number equations within sections (i.e. 1.1, 1.2, 2.1, 2.2 instead of 1, 2, 3, 4)
+\numberwithin{figure}{section} % Number figures within sections (i.e. 1.1, 1.2, 2.1, 2.2 instead of 1, 2, 3, 4)
+\numberwithin{table}{section} % Number tables within sections (i.e. 1.1, 1.2, 2.1, 2.2 instead of 1, 2, 3, 4)
+
+\setlength\parindent{0pt} % Removes all indentation from paragraphs - comment this line for an assignment with lots of text
+
+%----------------------------------------------------------------------------------------
+%	TITLE SECTION
+%----------------------------------------------------------------------------------------
+
+\newcommand{\horrule}[1]{\rule{\linewidth}{#1}} % Create horizontal rule command with 1 argument of height
+
+\title{	
+\normalfont \normalsize 
+\textsc{Northwestern University, EECS Department} \\ [25pt] % Your university, school and/or department name(s)
+\horrule{0.5pt} \\[0.4cm] % Thin top horizontal rule
+\huge EECS 336 Homework 2 \\ % The assignment title
+\horrule{2pt} \\[0.5cm] % Thick bottom horizontal rule
+}
+
+\author{Yuchen Yang and Zhiyuan Wang} % Your name
+
+\date{\normalsize\today} % Today's date or a custom date
+
+\makeatletter
+\renewcommand{\section}{\@startsection{section}{1}{0mm}
+  {-\baselineskip}{0.5 \baselineskip}{\bf\leftline}}
+\makeatother
+\makeatletter
+\renewcommand{\subsection}{\@startsection{subsection}{10}{0mm}{-\baselineskip}{0.5 \baselineskip}{\bf\leftline}}
+\makeatother
+
+\begin{document}
+
+\maketitle % Print the title
+
+%----------------------------------------------------------------------------------------
+%	PROBLEM 1
+%----------------------------------------------------------------------------------------
+
+\section{ \it{\textbf{Algorithm Desgin}} \calligra{P} 4.4 }
+
+\begin{algorithm}
+\caption{find subsequence}
+ssume first element in each sequence starts at s(1), s'(1)
+\begin{algorithmic}
+\STATE s'Count = 1
+\STATE sCount = 1
+\WHILE {(s'Count $\leq$ m) \AND (sCOunt $\leq$ n)}
+\IF{S'(s'Count) == S(sCount)}
+\STATE s'Count++
+\ENDIF
+\STATE sCount++
+\ENDWHILE
+\IF{s'Count > m}
+\RETURN $s'$ is a subsequence of $s$
+\ELSE
+\RETURN $s'$ is not a subsequence of $s$
+\ENDIF
+\end{algorithmic}
+\end{algorithm}
+
+\begin{proof}
+
+\textbf{Correctness}. 
+The algorithm starts by checking $S'(1)$ with elements in $S$ in order. If it finds a match, stop,
+replace $S'(1)$ with $S'(2)$ and then resume checking with those unchecked elements in $S$ in order. 
+If it finds a match, stop, replace $S'(2)$ with $S'(3)$ and then resume checking with those unchecked
+elements in $S$ in order (This way, every element in $S$ will be checked at most once, meaning that $S'(2)$ 
+will not check with those that have been checked by S'(1) and $S'(3)$ will not check with those that have been
+checked by $S'(2)$. This is because order matters, any element in S that has been checked by $S'(1)$ occurs either at $S'(1)$ or before $S'(1)$ 
+whereas $S'(2)$ occurs after $S'(1)$, so those been checked by $S'(1)$ are irrelevant to $S'(2)$). 
+  Continue in this fashion until either:   
+\begin{enumerate}
+\item s'Count > m and sCount <= n
+every element in $S'$ has a match and not all elements in $S$ got checked 
+
+or\item s'Count <= m and sCount > n
+not every element in $S'$ has a match and all elements in $S$ got checked 
+
+or \item s'Count > m and sCount > n
+every element in $S'$ has a match and all elements in $S$ got checked
+\end{enumerate}
+
+For cases "1" and "3", s'Count > m, every element in $S'$ has a match and we know it's ordered, so S' is a 
+subsequence of S.
+For case "2", s'Count <= m, not every element in $S'$ has a match after checking with all of the elements in $S$,
+so S' is not a subsequence of $S$.
+%begin{paragraph}
+\\
+\textbf{Runtime}.
+The worst case scenario happens when it has to check every element in $S$ (update sCount n times) and
+every element in S' (update s'Count m times). So runtime is $O(m+n)$. 
+%\end{paragraph}
+\end{proof}
+
+%\newpage
+
+\section{Additional Problems}
+\begin{enumerate}
+\item % pro 1
+\begin{enumerate}
+\item
+If all jobs worth the same value, then weighted interval scheduling = unweighted interval scheduling.
+If an algorithm fails for unweighted, then is will also fail for weighted when all jobs worth the same value.
+
+\item
+\begin{enumerate}
+\item
+\begin{figure}[h]
+\centering
+\begin{picture}(100, 50)(0, 20)
+\setlength{\unitlength}{5cm}
+\put(-0.3,0.1){\line(1,0){0.7}}
+\put(-0.23,0.14){$v_1=3, t_1=1.5$}
+\put(0.5,0.1){\line(1,0){0.7}}
+\put(0.57, 0.14){$v_3=3, t_3=1.5$}
+\put(0.2,0.3){\line(1,0){0.5}}
+\put(0.25, 0.34){$v_2=3, t_2=1$}
+\end{picture} 
+\caption{A contradicton of $\cfrac{v}{t}$ first greedy algorithm}
+\label{a1}
+\end{figure}
+\begin{proof}
+Greedy by Value/Time algorithm do not consider the compatibility of the job. It may choose some tasks which have a bigger value and take smaller time but conflicts with multiple tasks, which have a larger overall value, but a lower score of Value/Time, such as figure \ref{a1} shows.
+\end{proof}
+\item
+\begin{figure}[h]
+\centering
+\begin{picture}(100, 50)(0, 20)
+\setlength{\unitlength}{5cm}
+\put(-0.4,0.26){\line(1,0){0.7}}
+\put(-0.1,0.30){$2$}
+\put(0.4,0.26){\line(1,0){0.7}}
+\put(0.7,0.30){$2$}
+\put(-0.4,0.16){\line(1,0){0.35}}
+\put(-0.17,0.18){1}
+\put(0.2,0.16){\line(1,0){0.35}}
+\put(0.37, 0.18){1}
+\put(0.8,0.16){\line(1,0){0.35}}
+\put(0.97,0.18){1}
+\put(0.2, 0.06){\line(1,0){0.35}}
+\put(0.37,0.08){1}
+\end{picture} 
+\caption{A contradicton of greedy by total remaining feasible job value algorithm}
+\label{a2}
+\end{figure}
+\begin{proof}
+As figure \ref{a2} shows, if we take the job on the left top(with value 2), the total value of the remaining jobs is 3. If we take the job below, the total value of the remaining jobs is 2. For the right top job with value 2, it faces the same situation. And the two 1 job in the middle will leave remaining jobs with value 5, it's bigger than the two jobs on the top, so we won't take them. Thus based on the indicated algorithm we would take the two 1 job on the left and right, but their total value 2 is less than the top two 2 jobs(total value 4), that contradicts the hypothesis.   
+\end{proof}
+\item
+\begin{figure}[h]
+\centering
+\begin{picture}(100, 50)(0, 20)
+\setlength{\unitlength}{5cm}
+\put(-0.3,0.1){\line(1,0){0.7}}
+\put(0,0.14){2}
+\put(0.5,0.1){\line(1,0){0.7}}
+\put(0.8, 0.14){2}
+\put(0.2,0.3){\line(1,0){0.5}}
+\put(0.4, 0.34){3}
+\end{picture} 
+\caption{A contradicton of greedy by largest remaining job algorithm}
+\label{a3}
+\end{figure}
+\begin{proof}
+There exists the case when a job with a bigger value but conflicts multiple jobs, which have a smaller value individually, but a bigger value in overall. As figure \ref{a3} shows, 3 is bigger than other two jobs, but the optimal solution is to take the two jobs below which have a total value 4. 
+\end{proof}
+\end{enumerate}
+\end{enumerate}
+\newpage
+\item % pro 2
+\begin{algorithm}
+\caption{set the least number of stations to cover all houses}
+assume houses have been sorted in order - most west to east
+\begin{algorithmic}
+\WHILE{number of houses hasn't been covered > 0}
+\STATE find distance between most west and most east
+\IF{distance > 8 miles}
+\STATE set up a base 4 miles east from the most west
+\ENDIF
+\STATE set up a base 4 miles east from the most east
+\STATE take houses which got covered out
+\ENDWHILE
+\end{algorithmic}
+\end{algorithm}
+\begin{proof}
+\textbf{Correctness}.
+This is basically a depth of graph problem. If the distance between two houses is bigger than 8 miles then they 
+conflict with each other and depth is at least two. 
+
+The algorithm starts by calculating the distance between most east and most west. If it's smaller than or equal 
+to 8 miles, then the depth is 1 and we add 1 base, say 4 miles west from the most east (distance from most west to the base will 
+be smaller than or equal to 4 miles, so will be covered). If it's
+bigger than 8 miles, then they conflict with each other and depth is 2, so we need to set up two bases, one 
+4 miles west from most east and another one 4 miles east from most west in order to cover the most space. We then take
+out all of the houses that have been covered.
+Re-run the above algorithm, which increases the depth by 2 if most east and most west conflict with each 
+other and by 1 if not, until all houses have been covered. This is because the remaining houses also conflict with both the
+previous most east and most west, if they don't conflict with themself, depth should increase by 1. If most east and most west in the remaining houses also conflict
+with each other, then the total number of conflicts becomes previous depth + 2.
+
+After covering all of the houses, the final depth represents the minimun number of bases needed to cover all of the houses.
+\\
+\textbf{Runtime}.
+The worst case senario happens when depth = number of houses, meaning every house conflicts with every other houses, thus requiring setting
+up a base for every house. The runtime would be $O(n)$.
+\end{proof}
+\item % pro 3
+\begin{figure}[h]
+\centering
+\begin{picture}(100, 60)(0, 20)
+\setlength{\unitlength}{5cm}
+%\put(0,0.04){\line(1,1){0.5}}
+\put(0,0.55){\line(0,-1){0.4}}
+\put(0,0.15){\line(1,0){0.4}}
+\put(0,0.55){\line(1,-1){0.4}}
+\put(0,0.55){\line(-1,-1){0.4}}
+\put(-0.01,0.58){a}
+\put(-0.05,0.28){2}
+\put(0.28,0.28){1}
+\put(-0.23, 0.37){3}
+\put(-0.45,0.08){b}
+\put(0,0.08){c}
+\put(0.2,0.08){1}
+\put(0.4,0.08){d}
+%\put(){\line{0,1}{0.1}}
+%\put(0,0.14){2}
+\end{picture} 
+\caption{A contradicton of greedy by largest remaining job algorithm}
+\label{31}
+\end{figure}
+\begin{enumerate}
+\item
+NO.
+\begin{proof}
+As figure \ref{31} show, for such graph, $$MBST=(a,b), (a,c), (a,d) = 3+2+1=6$$
+$$MST = (a,b), (a,d), (d,c) = 3+1+1=5$$ 
+$MBST \neq MST$, that contradicts the assumption.
+\end{proof}
+\item
+Yes.
+\begin{proof}
+Suppose T is a MST and not a MBST, then there must exists an edge, e in MST, such that it is weighted more than
+any edge in a MBST. If we take out e, then T becomes a two components graph. However, at the same time, a MBST 
+must be connecting these two components with another edge, e', meaning that e can be replaced by e'. Since e' is 
+weighted less than e, and able to form a spanning tree weighted less than T, T is not a MST. This contradicts our 
+initial hypothesis.
+\end{proof}
+\end{enumerate}
+
+\item % pro 4
+\begin{enumerate}
+\item
+\begin{proof}
+Suppose we have there points, namely $A$, $B$, and $C$, and they have value $A>B>C$, now we want pick two of them. For a set $S$, If the effect between them won't cause a change of their overall weight, then we can say $S$ is independent. Suppose $B$ can decrease $A$'s weight, while $C$ can increase $A$'s weight in the same value, then for $S={A, B, C}$, $v(A,B,C) = v(A)+v(B)+v(C)$, $S\in \mathcal{I}$. But since $v(A,B)<v(A)+v(B)$, ${A,B} \not \in \mathcal{I}$, while ${A,B} and {A,C} \cap S$, that contradicts the downward-closed property. By greedy by weight algorithm, we will pick ${A, B}$. Suppose $v(A)=3, v(B)=2, v(C)=1.5$, and $v(A,B) = 3+2-1=5$, $v(A,C)=3+1.5+1=5.5$. In this case $v(B,C)>v(A,B)$, that means greedy by weight algorithm do not achieve an optimal solution here.
+\end{proof}
+\item
+\begin{figure}[h]
+\centering
+\begin{picture}(100, 50)(0, 20)
+\setlength{\unitlength}{5cm}
+\put(-0.7, 0.26){$A$}
+\put(-0.7, 0.16){$B$}
+\put(-0.4,0.26){\line(1,0){0.7}}
+\put(-0.1,0.30){$2$}
+\put(0.4,0.26){\line(1,0){0.7}}
+\put(0.7,0.30){$2$}
+\put(-0.4,0.16){\line(1,0){0.35}}
+\put(-0.17,0.18){1.5}
+\put(0.2,0.16){\line(1,0){0.35}}
+\put(0.37, 0.18){1.5}
+\put(0.8,0.16){\line(1,0){0.35}}
+\put(0.97,0.18){1.5}
+\end{picture} 
+\caption{An example case for implementing greedy algorithm.}
+\label{4b}
+\end{figure}
+\begin{proof}
+Let's consider job scheduling problem, again. We can define two jobs are independent with each other, when they are compatible. As figure \ref{4b} shows, there are 2 independent sets of jobs, namely $A$ and $B$, and $B$ is larger than $A$. But all of the jobs $j_i \in A/B$ will make $B \cup j_i \not \in  \mathcal{I}$, that contradict the augmentation property. But if we use greedy by weight, we will pick the set $A$, but set $B$ have a bigger total value. That means greedy by weight can not get a optimal solution in this case.
+\end{proof}
+\end{enumerate}
+\end{enumerate} 
+
+\begin{comment}
+\lipsum[2] % Dummy text
+\begin{align} 
+\begin{split}
+(x+y)^3 	&= (x+y)^2(x+y)\\
+&=(x^2+2xy+y^2)(x+y)\\
+&=(x^3+2x^2y+xy^2) + (x^2y+2xy^2+y^3)\\
+&=x^3+3x^2y+3xy^2+y^3
+\end{split}					
+\end{align}
+
+Phasellus viverra nulla ut metus varius laoreet. Quisque rutrum. Aenean imperdiet. Etiam ultricies nisi vel augue. Curabitur ullamcorper ultricies
+
+%------------------------------------------------
+
+\subsection{Heading on level 2 (subsection)}
+
+Lorem ipsum dolor sit amet, consectetuer adipiscing elit. 
+\begin{align}
+A = 
+\begin{bmatrix}
+A_{11} & A_{21} \\
+A_{21} & A_{22}
+\end{bmatrix}
+\end{align}
+Aenean commodo ligula eget dolor. Aenean massa. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Donec quam felis, ultricies nec, pellentesque eu, pretium quis, sem.
+
+%------------------------------------------------
+
+\subsubsection{Heading on level 3 (subsubsection)}
+
+\lipsum[3] % Dummy text
+
+\paragraph{Heading on level 4 (paragraph)}
+
+\lipsum[6] % Dummy text
+
+%----------------------------------------------------------------------------------------
+%	PROBLEM 2
+%----------------------------------------------------------------------------------------
+
+\section{Lists}
+
+%------------------------------------------------
+
+\subsection{Example of list (3*itemize)}
+\begin{itemize}
+	\item First item in a list 
+		\begin{itemize}
+		\item First item in a list 
+			\begin{itemize}
+			\item First item in a list 
+			\item Second item in a list 
+			\end{itemize}
+		\item Second item in a list 
+		\end{itemize}
+	\item Second item in a list 
+\end{itemize}
+
+%------------------------------------------------
+
+\subsection{Example of list (enumerate)}
+\begin{enumerate}
+\item First item in a list 
+\item Second item in a list 
+\item Third item in a list
+\end{enumerate}
+\end{comment}
+%----------------------------------------------------------------------------------------
+
+\end{document}

@@ -1,0 +1,408 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Short Sectioned Assignment
+% LaTeX Template
+% Version 1.0 (5/5/12)
+%
+% This template has been downloaded from:
+% http://www.LaTeXTemplates.com
+%
+% Original author:
+% Frits Wenneker (http://www.howtotex.com)
+%
+% License:
+% CC BY-NC-SA 3.0 (http://creativecommons.org/licenses/by-nc-sa/3.0/)
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%----------------------------------------------------------------------------------------
+%	PACKAGES AND OTHER DOCUMENT CONFIGURATIONS
+%----------------------------------------------------------------------------------------
+
+\documentclass[paper=a4, fontsize=11pt]{scrartcl} % A4 paper and 11pt font size
+
+\usepackage[T1]{fontenc} % Use 8-bit encoding that has 256 glyphs
+\usepackage{fourier} % Use the Adobe Utopia font for the document - comment this line to return to the LaTeX default
+\usepackage[english]{babel} % English language/hyphenation
+\usepackage{amsmath,amsfonts,amsthm} % Math packages
+
+\usepackage{lipsum} % Used for inserting dummy 'Lorem ipsum' text into the template
+
+\usepackage{sectsty} % Allows customizing section commands
+\allsectionsfont{\centering \normalfont\scshape} % Make all sections centered, the default font and small caps
+
+\usepackage{fancyhdr} % Custom headers and footers
+
+\usepackage{verbatim} % Enable batch comments
+
+\usepackage{algorithm}
+\usepackage{algorithmic} % pesudo code
+
+\usepackage{calligra}
+\usepackage[T1]{fontenc} % Enable caligra typeface
+
+\pagestyle{fancyplain} % Makes all pages in the document conform to the custom headers and footers
+\fancyhead{} % No page header - if you want one, create it in the same way as the footers below
+\fancyfoot[L]{} % Empty left footer
+\fancyfoot[C]{} % Empty center footer
+\fancyfoot[R]{\thepage} % Page numbering for right footer
+\renewcommand{\headrulewidth}{0pt} % Remove header underlines
+\renewcommand{\footrulewidth}{0pt} % Remove footer underlines
+\setlength{\headheight}{13.6pt} % Customize the height of the header
+
+\numberwithin{equation}{section} % Number equations within sections (i.e. 1.1, 1.2, 2.1, 2.2 instead of 1, 2, 3, 4)
+\numberwithin{figure}{section} % Number figures within sections (i.e. 1.1, 1.2, 2.1, 2.2 instead of 1, 2, 3, 4)
+\numberwithin{table}{section} % Number tables within sections (i.e. 1.1, 1.2, 2.1, 2.2 instead of 1, 2, 3, 4)
+
+\setlength\parindent{0pt} % Removes all indentation from paragraphs - comment this line for an assignment with lots of text
+
+%----------------------------------------------------------------------------------------
+%	TITLE SECTION
+%----------------------------------------------------------------------------------------
+
+\newcommand{\horrule}[1]{\rule{\linewidth}{#1}} % Create horizontal rule command with 1 argument of height
+
+\title{	
+\normalfont \normalsize 
+\textsc{Northwestern University, EECS Department} \\ [25pt] % Your university, school and/or department name(s)
+\horrule{0.5pt} \\[0.4cm] % Thin top horizontal rule
+\huge EECS 336 Homework 1 \\ % The assignment title
+\horrule{2pt} \\[0.5cm] % Thick bottom horizontal rule
+}
+
+\author{Zhiyuan Wang and Yuchen Yang} % Your name
+
+\date{\normalsize\today} % Today's date or a custom date
+
+\makeatletter
+\renewcommand{\section}{\@startsection{section}{1}{0mm}
+  {-\baselineskip}{0.5 \baselineskip}{\bf\leftline}}
+\makeatother
+\makeatletter
+\renewcommand{\subsection}{\@startsection{subsection}{10}{0mm}{-\baselineskip}{0.5 \baselineskip}{\bf\leftline}}
+\makeatother
+
+\newenvironment{myproof}{\begin{proof}\setlength{\parindent}{2em}}{\end{proof}}
+
+\begin{document}
+\setlength{\parindent}{2em}
+\maketitle % Print the title
+
+%----------------------------------------------------------------------------------------
+%	PROBLEM 1
+%----------------------------------------------------------------------------------------
+
+\section{ \it{\textbf{Algorithm Desgin}} \calligra{P} 3.2 }
+
+Give an algorithm to detect whether a given undirected graph contains a cycle. If the graph contains a cycle, then your algorithm should output one. (It should not output all cycles in the graph, just one of them.) The running time of your algorithm should be O(m + n) for a graph with n nodes and m edges.
+
+\subsection{Solution}
+For convenience, we assume the undirected graph $G$ contains only one BFS tree $T$, otherwise we can consider different trees separately. Our cycle detection algorithm is based on BFS \cite{KT06}. The difference is that when we consider a edge, namely edge $(u, w)$, of a new node $u$ in layer $L_{i+1}$, we also test whether $w$(other than $u$'s parent $v$ in $T$) is already discovered. If so there must be a circle, then we use function findLeastParent to find $u$ and $w$'s least common parent $y$ and return all the nodes between $v$ and $y$, else continue.
+
+
+For the runtime, since the modified BFS has the same runtime upperbound($O(m+n)$) as BFS, and findLeastParent is $O(n)$, thus this algorithm is $O(m+n)$.
+
+\newtheorem{theorem}{Theorem}[section]
+\begin{theorem}
+For an undirected graph $G$, if a node $u$ in its BFS tree $T$ connects with node other than its parent and child in $T$, there must be a cycle in $G$.  
+\end{theorem}
+\begin{proof}
+Suppose the BFS tree $T$ is rooted at node $s$, $u$ is a node in layer $L_i$, $v$ is $u$'s child in layer $L_{i+1}$, while $v$ also connects to another node $w$ in layer $L_j (j<=i+1) $. 
+\\If $w$ is a child or parent of $u$, then $u, v, w$ form a circle,
+\\otherwise there must be a node $y$ in layer $L_k (k<i, j)$ have path to both $u$ and $w$, then $k \to u \to v \to w \to k$ form a circle.
+\qedhere
+\end{proof}
+
+\begin{algorithm}
+\caption{Modified from \cite{KT06}'s BFS(s)}
+\textbf{Set} Discovered[$s$] = true and Discovered[$v$] = false for all other $v$
+\\ \textbf{Initialize} $L[0]$ to consist of the single element $s$
+\\ \textbf{Set} the layer counter $i = 0$
+\\ \textbf{Set} the current BFS tree $T = \emptyset$
+\begin{algorithmic}
+\WHILE {$L[i]$ is not empty}
+	\STATE Initialize an empty list $L[i+1]$
+	\FOR {each node $v \in L[i]$}
+	\STATE Consider each edge $(v, w)$ incident to $v$
+		\IF {Discovered($w$)=true \&\& $w \neq u$}
+			\STATE \textbf{return} $findLeastParent(u, w)$
+		\ELSIF {Discovered($w$) = false}
+			\STATE Set Discovered[$w$] = true
+			\STATE Add edge $(v, w)$ to the tree $T$
+		\ENDIF
+	\ENDFOR
+	\STATE Increment the layer counter $i$ by one
+\ENDWHILE
+\STATE \textbf{Return} 0
+\end{algorithmic}
+\end{algorithm}
+
+\newpage
+
+\section{Additional Problems}
+\begin{enumerate}
+\item
+\begin{proof}
+\begin{equation}
+n! = n \cdot (n-1) \cdot (n-2) \ldots (\cfrac{n}{2}+1) \cdot \cfrac{n}{2} \cdot (\cfrac{n}{2}-1) \ldots \cdot 2 \cdot 1
+\end{equation}
+\begin{equation}
+(n/2)^{n/2} \leq n\cdot (n-1) \ldots (\cfrac{n}{2}+1) \cdot \cfrac{n}{2} \leq n! \leq n \ldots n=n^n
+\end{equation}
+\begin{equation}
+\cfrac{n}{2}\log n - \cfrac{n}{2}\log 2 \leq log(n!)\leq n\log n
+\end{equation}
+For sufficient large $n$,\ $2\log n\geq \log 2$, $$\cfrac{n}{2}\log n - \cfrac{n}{2}\log 2=\cfrac{n}{4}\log n + (\cfrac{n}{4}\log n - \cfrac{n}{2}\log 2)\geq \cfrac{n}{4}\log n$$
+\begin{equation}
+\cfrac{n}{4} \log n \leq log(n!) \leq n\log n
+\end{equation}
+Thus, $log(n!)=\Theta(n \log n)$
+\qedhere
+\end{proof}
+\newpage
+\item
+\begin{comment}
+\begin{algorithm} 
+\begin{algorithmic}
+\STATE Divide the orbs into 3 identical groups, we can name them $G1, G2$ and $G3$.
+\STATE $r_0=scale(G1, G2)$
+\IF {$r=balance$}
+	\STATE fake orb must in $G3$, $G=G3$	
+	\STATE $r_1=scale(G1, G3)$
+	\STATE from $r_1$ we know the fake orb is heavier or lighter.
+\ELSE
+	\STATE fake orb must in $G1$ or $G2$
+	\STATE $r_2=scale(G1, G3)$	
+	\IF {$r_2=balance$}
+		\STATE fake orb must in $G2$, $G=G2$
+		\STATE from $r_0$ we know the fake orb is heavier or lighter
+	\ELSE
+		\STATE fake orb must in $G1$, $G=G1$
+		\STATE from $r_0 (r_2=r_0)$, we know the fake orb is heavier or lighter
+	\ENDIF
+\ENDIF
+\STATE Since we already know the fake orb is heavier or lighter,
+now we can simply recursively divide the group $G$ into half and half, and scale them, until we find the fake orb.
+\end{algorithmic}
+\end{algorithm}
+\newpage
+\begin{proof}
+For the first few steps, we just want to figure out the fake orb is heavier or lighter, and find the subgroup contains the fake orb. In the algorithm description, we analyze all the cases, so that must be correct.  
+\ident In the following steps, it's just like a binary search, since in each recursion we exclude half of the samples, the algorithm need $log_2(n/3)+c $($c$ is a constant) operations, so the runtime is $O(\log n)$. 
+\end{comment}
+\begin{myproof}
+We first divide the orbs into 3 identical groups(if there is 1 or 2 extra orbs, put them away). After at most 3 times scale, we can figure out the relation of the weight of these 3 groups.  If they have identical weight, then the fake orb must be in the extra orbs, it's easy to find out which one is fake, for detail please see the pseudocode below. Otherwise, we can figure out the fake orb is heavier or lighter, and obtain the subgroup contains the fake orb.
+
+ Since we already know  the fake orb is heavier or lighter, we can assume it is heavier. Then we recursively divide the subgroup contains the fake orb into half and half, and find the heavier part. In this way, we can finally obtain the fake orb. If there is an extra orb, just put that orb away and weigh the rest orbs, if they are identical, then the fake orb is the extra orb, otherwise it's a good one.
+
+For runtime, since the first part of this algorithm, from which we know the fake orb is heavier or lighter, only need constant time, and in each recursion of the second part we reduce search space into half, so it's $O(\log_2 n)$. Thus the runtime of this algorithm is $O(\log n)$.
+(A more comprehensive solution can be found in \cite{MD03})\qedhere
+\end{myproof}
+\begin{algorithm}
+\caption{Divide the orbs into 3 groups and find out if the fake orb is lighter or heavier}
+n is the total number of orbs
+\begin{algorithmic}
+\IF{n==1}
+	\RETURN the orb is fake
+\ELSIF{n==2}
+	\RETURN cannot determine which orb is fake
+\ELSIF{n>=3}
+	\IF{(n-2)\%3==0} 
+     	\STATE take out 2 orbs
+     	\STATE set orbA = true
+     	\STATE set orbB = true
+	\ELSIF{(n-1)\%3==0}
+		\STATE take out 1 orb
+		\STATE set orbA = true
+	\ENDIF
+	\STATE divide the rest of orbs into 3 groups, namely groupA, groupB, groupC
+	\STATE heavierA2B = \textbf{weight}(groupA, groupB)
+	\STATE heavierA2C = \textbf{weight}(groupA, groupC)
+	\IF{heavierA2B == heavier and heavierA2C == heavier}
+		\STATE fakeOrbWeight = heavier
+		\STATE groupContainFake = groupA
+	\ELSIF{heavierA2B == lighter and heavierA2C == lighter}
+		\STATE fakeOrbWeight = lighter
+		\STATE groupContainFake =  groupA
+	\ELSIF{heavierA2B == heavier and heavierA2C == same}
+		\STATE fakeOrbWeight = lighter
+		\STATE groupContainFake = groupB
+	\ELSIF{heavierA2B == lighter and heavierA2C == same}
+		\STATE fakeOrbWeight = heavier
+		\STATE groupContainFake = groupB
+	\ELSIF{heavierA2B == same and heavierA2C == heavier}
+		\STATE fakeOrbWeight = lighter
+		\STATE groupContainFake = groupC
+	\ELSIF{heavierA2B == same and heavierA2C == lighter}
+		\STATE fakeOrbWeight = heavier
+		\STATE groupContainFake = groupC
+	\ELSE
+		\IF{orbA == true and orbB == false}
+			\RETURN orbA
+		\ELSE
+			\STATE take one orb from groupA and name it orbC
+			\STATE weight orbA against orbC
+			\IF{weights are different}
+				\RETURN orbA
+			\ELSE 
+				\RETURN orbB
+			\ENDIF
+		\ENDIF
+	\ENDIF
+\ENDIF
+\end{algorithmic}
+\end{algorithm}
+\begin{algorithm}
+\caption{find out which orb is fake}
+\begin{algorithmic}
+\WHILE{number of orbs in groupContainFake >= 2}
+	\IF{ size(groupContainFake) is odd}
+		\STATE take out 1 orb from groupContainFake, name it orbD
+	\ENDIF
+	\STATE divide groupContainFake into 2 groups, name them groupC, groupD
+	\STATE heavierC2D = \textbf{weight}(groupC, groupD)
+		\IF{heavierC2D == same}
+			\RETURN orbD		
+		\ELSIF{heavierC2D == fakeOrbWeight}
+			\STATE groupContainFake = groupC
+		\ELSE
+			\STATE groupContainFake = groupD
+		\ENDIF
+		\STATE clean groupC and groupD
+\ENDWHILE
+\end{algorithmic}
+\end{algorithm}
+\newpage
+\item
+\begin{proof}
+Let $f(x) = cos(x)$, $g(x)=sin(x)$, then:
+\begin{enumerate}
+\item If $f=O(g)$, let $x=2n\pi+5$, for sufficient large $n$, $x\rightarrow \infty$, thus $cos(2n\pi+5)$ should be no larger than $sin(2n\pi+5)$, but $cos(2n\pi+5)=0.28$, while $sin(2n\pi+5)=-0.95$. $cos(2n\pi+5)>sin(2n\pi+5)$, that contradicts the hypothesis.
+\item If $g=O(f)$, let $x=2n\pi+1$, in the same way, $sin(2n\pi+1)$ should no larger than $cos(2n\pi+1)$, but $cos(2n\pi+1)=0.54$, while $sin(2n\pi+1)=0.84$. $sin(2n\pi+1)>cos(2n\pi+1)$, that contradicts the assumption.
+\end{enumerate} 
+Thus $g \neq O(f), f \neq O(g)$.
+\qedhere
+\end{proof}
+\item
+\begin{proof}
+\begin{equation}
+2\sum\limits_{1 \leq i<j \leq n} a_i a_j + \sum\limits_{1\leq i\leq n}a_i^2 = (\sum\limits_{1\leq i\leq n} a_i)^2
+\end{equation}
+\begin{equation}\label{e22}
+\sum\limits_{1 \leq i<j \leq n} a_i a_j=0.5[(\sum\limits_{1\leq i\leq n} a_i)^2-\sum\limits_{1\leq i\leq n}a_i^2]
+\end{equation}
+Since the right part of the equation \ref{e22}, $(\sum\limits_{1\leq i\leq n} a_i)^2$ and $\sum\limits_{1\leq i \leq n}a_i^2$, can be computed using $n+1$ operations and $n$ operations respectively, in this way $\sum\limits_{1 \leq i<j \leq n} a_i a_j$ can be computed using $O(n)$ operations.
+\ref{e22} can be demonstrated using induction.
+\begin{equation}
+\begin{split}
+(\sum\limits_{1\leq i \leq n}a_i)^2 & =(\sum\limits_{1\leq i\leq n-1}a_i + a_n)^2 \\
+& = (\sum\limits_{1\leq i \leq n-1}a_i)^2 + 2a_n\sum\limits_{1\leq i \leq n-1} a_i+a_n^2 \\
+& = \sum\limits_{1\leq i \leq n-1}a_i^2+2\sum\limits_{1\leq i<j\leq n-1}a_i a_j + 2a_n\sum\limits_{1\leq i \leq n-1} a_i+a_n^2 \\
+& = \sum\limits_{1\leq i \leq n}a_n^2 + 2\sum\limits_{1\leq i<j\leq n}a_i a_j
+\end{split}
+\end{equation}
+\qedhere
+\end{proof}
+\end{enumerate}
+Another Solution (also can be proved by induction like above):
+\begin{algorithm}
+\begin{algorithmic}
+\FOR {$i=1$ to $i\leq n$}
+	\STATE $integerSum = integerSum + a_i$
+\ENDFOR
+\FOR{$i=1$ to $i<n$}
+	\STATE $integerSum = integerSum - a_i$
+	\STATE $Sum = Sum + a_i * integerSum$
+\ENDFOR
+\RETURN $Sum$
+\end{algorithmic}
+\end{algorithm}
+
+\begin{thebibliography}{9}
+
+\bibitem{KT06}
+  Kleinberg Jon, and Eva Tardos,
+  \emph{ Alogrithm Design}.
+  Pearson Education Inc.,
+  2nd Edition,
+  2006, 90-91.
+  
+\bibitem{MD03}
+ Mackay, David JC, 
+ \emph{Information theory, inference and learning algorithms},
+ Cambridge University Press, 2003,
+ 66-70.
+  
+\end{thebibliography}
+
+
+\begin{comment}
+\lipsum[2] % Dummy text
+\begin{align} 
+\begin{split}
+(x+y)^3 	&= (x+y)^2(x+y)\\
+&=(x^2+2xy+y^2)(x+y)\\
+&=(x^3+2x^2y+xy^2) + (x^2y+2xy^2+y^3)\\
+&=x^3+3x^2y+3xy^2+y^3
+\end{split}					
+\end{align}
+
+Phasellus viverra nulla ut metus varius laoreet. Quisque rutrum. Aenean imperdiet. Etiam ultricies nisi vel augue. Curabitur ullamcorper ultricies
+
+%------------------------------------------------
+
+\subsection{Heading on level 2 (subsection)}
+
+Lorem ipsum dolor sit amet, consectetuer adipiscing elit. 
+\begin{align}
+A = 
+\begin{bmatrix}
+A_{11} & A_{21} \\
+A_{21} & A_{22}
+\end{bmatrix}
+\end{align}
+Aenean commodo ligula eget dolor. Aenean massa. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Donec quam felis, ultricies nec, pellentesque eu, pretium quis, sem.
+
+%------------------------------------------------
+
+\subsubsection{Heading on level 3 (subsubsection)}
+
+\lipsum[3] % Dummy text
+
+\paragraph{Heading on level 4 (paragraph)}
+
+\lipsum[6] % Dummy text
+
+%----------------------------------------------------------------------------------------
+%	PROBLEM 2
+%----------------------------------------------------------------------------------------
+
+\section{Lists}
+
+%------------------------------------------------
+
+\subsection{Example of list (3*itemize)}
+\begin{itemize}
+	\item First item in a list 
+		\begin{itemize}
+		\item First item in a list 
+			\begin{itemize}
+			\item First item in a list 
+			\item Second item in a list 
+			\end{itemize}
+		\item Second item in a list 
+		\end{itemize}
+	\item Second item in a list 
+\end{itemize}
+
+%------------------------------------------------
+
+\subsection{Example of list (enumerate)}
+\begin{enumerate}
+\item First item in a list 
+\item Second item in a list 
+\item Third item in a list
+\end{enumerate}
+\end{comment}
+%----------------------------------------------------------------------------------------
+
+\end{document}
