@@ -1,5 +1,5 @@
-#include "air_freight.h"
-#include "astronmy.h"
+#include "air_freight.hpp"
+#include "astronmy.hpp"
 
 int main()
 {
