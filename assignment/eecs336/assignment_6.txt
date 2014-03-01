@@ -1,0 +1,37 @@
+7.12
+1)run Ford-Folkerson algorithm to find the maximum flow in G
+2)find the minimum cut c in the residual graph by BFS
+3)Ec <- identify-edges-in-cut(c)
+4)if(Ec.size >= k)
+    F <- choose k edges from Ec 
+  else
+    F <- choose all the edges in Ec, plus any k-i edges from other part of G 
+5)return F
+
+Proof. Correctness. According to Max-Flow Min-Cut Theorem, Max-Flow equals Min-Cut, and if we delete k edges from the minimum cut, the new cut will still be the minimum cut(its value is less than the previous minimum cut by k and also be less than other cut in G), thus the maximum flow is reduced by k. If all the edges in the minimum cut are deleted, then the maximum flow become 0, so delete any number of additional edges won't change the maximum flow, the algorithm can choose any other edges in G to delete.  
+
+Runtime. The Ford-Folkerson algorithm takes O(mC)(m is the number of edges in G, C is the capacity of edges). Step 2) takes O(m+n)(n is the number of nodes in G) time. Step 3) takes O(m) time. Step 4) can be finished in constant time. Thus totally the running time is O(mC).
+
+7.13
+1)n <- size of nodes in G
+for(i <- 1 to m)
+  {
+    c_ei <- infinity 
+  }
+for(j <- m+1 to m+n)
+  {
+    add new edge e_j with capacity c_vj, with two nodes v_j', and v_j"
+    connect every edges into v_j to v_j'(in)
+    connect every edges out v_j to v_j"(out)
+  }
+  
+2)run Ford-Fulkerson algorithm to find the maximum flow
+3)return the maximum flow
+
+Proof. Correctness. We want to tansform this problem into standard maximum flow problem, so first we should transform a node-capacitated network G into a normal one G'. We can see the edges in a node-capacitated network as the same of a normal network, since there is no capacity constraint of the edges, we can just set it to infinity. For the nodes, by definition, fin(v_i) is constrained by c(v_i), and by flow-conservation constraint fout(v_i) is also constrained by c(v_i). Therefore, we can see a node with capacity as an edge with the same capacity in a normal network. Connecting all the edges into node v_i to one end of this new edge, say v_i', which constitute fin(v_i), and connecting all the edges out of node v_i to another end of the new edge, say v_i", which constitute fout(v_i), then flow constraints is the same as in G, but the new graph G' is a standard network which can be sloved by Ford-Fulkerson Algorithm. Thus we transform the problem into standard maximum flow problem, then run Ford-Fulkerson Algorithm, we can find the maximum flow of the graph.  
+
+Define s-t cut for node-capacitated network. An s-t cut in G can be defined as the set of nodes that separate s from t if deleted. The value of such cut is the sum of capacity of nodes in the cut
+
+Show the analogue of the Max-Flow Min-Cut Theorem holds true. Since each note v_i in G corresponds to an edge with the same capacity and two node v_i' and v_i", so a minimum cut in G corresponds to a minimum cut in G' with the same value, plus G and G' has the same maximum flow, therefore the Max-Flow Min-Cut Theorem still holds true.
+
+Runtime. The initialization takes O(m+n) time. Since each note become an edge, the running time of the maximum flow algorithm is O((m+n)C)(m is the number of edges and n is the number of nodes in G, C is the total capacity of the nodes). Thus the total running time is O((m+n)C).
